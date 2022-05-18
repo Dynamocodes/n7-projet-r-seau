@@ -1,5 +1,10 @@
 # n7-projet-reseau
+
+![diego le gitan](./IMG_2357.jpg)
+> Attention a toi je suis diego le gitan je veux une bonne note
+
 N° du groupe : 0
+
 ## TLDR:
 Déploiement d'un AS interconnecté à d'autres AS, en suivant l'architecture réseau suivante
 [Maquette Figma](https://www.figma.com/file/b7xy9bIjHuaDB5alhV0iat/Projet-R%C3%A9seau?node-id=0%3A1)
