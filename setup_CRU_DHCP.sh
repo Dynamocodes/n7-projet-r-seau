@@ -5,7 +5,7 @@
 
 config_dhcp="
 auto $1
-iface $1 inet dhcp
+\niface $1 inet dhcp
 "
 
 echo $config_dhcp >> /etc/network/interfaces
