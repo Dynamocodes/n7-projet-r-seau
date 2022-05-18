@@ -13,7 +13,7 @@ apt install isc-dhcp-server
 
 # isc-dhcp-server config
 config="
-INTERFACES=$1
+INTERFACES=\"$1\"
 "
 
 # write config in isc-dhcp-server file
