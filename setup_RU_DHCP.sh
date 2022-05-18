@@ -25,7 +25,7 @@ default-lease-time 600;
 max-lease-time 7200;
 option subnet-mask 255.255.255.0;
 option broadcast-address 120.0.7.255;
-option domain-name-servers 120.0.5.3;
+option domain-name-servers 120.0.5.1;
 option domain-name \"reseau.acces.as0\";
 option routers 120.0.7.1;
 
