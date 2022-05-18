@@ -43,5 +43,5 @@ systemctl enable isc-dhcp-server
 systemctl enable isc-dhcp-server
 
 # permit requests to DHCP daemon on Firewall
-ufw allow 67/udp
-ufw reloa
+# ufw allow 67/udp
+# ufw reloa
