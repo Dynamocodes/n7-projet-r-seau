@@ -11,7 +11,7 @@ Chaque groupe est responsable de la mise en oeuvre d'un AS. Cette mise en oeuvre
 
 ### CAHIER DES CHARGES pour l'AS 0
 - L'AS O est un fournisseur de service réseau parmi lesquels un service d'accès Internet au particulier, un service d'accè Internet au réseau d'entreprise ou encore un service DNS.
-- L'AS utilise un protocole de routage dynamique.
+- L'AS utilise un protocole de routage dynamique. commits 
 - L'AS propose une solution d'interconnexion sans configuration pour ses clients particuliers.
 - Les clients de l'AS 0 sont:
   - Un site d'entreprise primaire géré par le groupe 0
@@ -41,7 +41,7 @@ Les trois groupes doivent mettre en place l'interconnexion de leur AS.
   - mettre en place un service de VoIP,
   - mettre en place au minimum un autre service applicatif  de votre choix
 
-- **Mise en oeuvre du site secondaire de l'entreprise
+- **Mise en oeuvre du site secondaire de l'entreprise**
   - mise en place du site secondaire
   - mise en place d'un VPN entre les sites
 
