@@ -2,6 +2,10 @@
 
 # arguments 
 # $1 : interface DHCP
+if [ -z "$1" ]; then
+    echo "Usage: $0 <interface>"
+    exit 1
+fi
 
 # Config DHCP pour le client
 apt update
@@ -13,7 +17,7 @@ INTERFACES=$1
 "
 
 # write config in isc-dhcp-server file
-echo $config > /etc/default/isc-dhcp-server
+echo "$config" > /etc/default/isc-dhcp-server
 
 config_dhcp="
 # Configuration DHCP
@@ -31,7 +35,7 @@ subnet 120.0.7.0 netmask 255.255.255.0 {
 "
 
 # write config in dhcpd config file
-echo $config_dhcp > /etc/dhcp/dhcp.conf
+echo "$config_dhcp" > /etc/dhcp/dhcp.conf
 
 # start dhcp
 systemctl start isc-dhcp-server
