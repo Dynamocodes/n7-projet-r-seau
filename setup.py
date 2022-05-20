@@ -70,15 +70,14 @@ def config_dhcp_server(interface_name):
   print("[*] Configured ISC DHCP")
   with open("/etc/dhcp/dhcp.conf", "w+") as dhcp_config:
     dhcp_config.writelines([
-      "default-lease-time 600;\n",
-      "max-lease-time 7200\n;",
+      "default-lease-time 86400;\n",
+      "max-lease-time 172800\n;",
       "option subnet-mask 255.255.255.0;\n",
       "option broadcast-address 120.0.7.255;\n",
-      "option domain-name-servers 120.0.5.3;\n",
-      "option domain-name \"reseau.acces.as0\";\n",
-      "option routers 120.0.7.1;\n",
       "subnet 120.0.7.0 netmask 255.255.255.0 {\n",
       "\trange 120.0.7.2 120.0.7.254;\n",
+      "\toption domain-name-servers 120.0.5.2;\n",
+      "\toption routers 120.0.7.1;\n", 
       "}\n"
     ])
   print("[*] Configured DHCP daemon")
