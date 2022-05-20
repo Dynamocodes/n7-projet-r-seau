@@ -229,7 +229,9 @@ elif role in ["re", "RE", "routeur-ent"]:
     {"dest": "0.0.0.0/0", "via": "120.0.5.2", "interface": "eth1"},
     {"dest": "192.168.0.0/24", "via": "192.168.0.1", "interface": "eth2"}
   ])
+  print("[*] Configuring NAT (POSTROUTING)")
   os.system("iptables -t nat -A POSTROUTING -o eth1 -j SNAT --to 120.0.5.2")
+  print("[*] Configuring NAT (PREROUTING)")
   os.system("iptables -t nat -A PREROUTING -p tcp --dport 80 -i eth1 -j DNAT --to 192.168.0.2:80")
   sys.exit(0)
 
