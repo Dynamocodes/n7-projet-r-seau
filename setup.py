@@ -135,8 +135,23 @@ def config_vpn():
       "SaveConfig = true\n"
     ])
 
-# Download and start TeamSpeak server
+def download_teamspeak():
+  download_url = "https://files.teamspeak-services.com/releases/server/3.13.6/teamspeak3-server_linux_amd64-3.13.6.tar.bz2"
+  download_path = "/tmp/"
+  print("[*] Downloading TeamSpeak server")
+  os.system("wget {} -P {}".format(download_url, download_path))
+  print("[*] Extracting TeamSpeak server archive")
+  os.system("tar -xf {} -C {}".format(download_path + "teamspeak3-server_linux_amd64-3.13.6.tar.bz2", download_path))
+
 def service_teamspeak():
+  print("[*] Starting TeamSpeak server")
+  os.system(
+    "{} /tmp/teamspeak3-server_linux_amd64/ts3server_startscript.sh start serveradmin_password=password virtualserver_codec_encryption_mode=1"
+    .format("TS3SERVER_LICENSE=accept")
+  )
+
+# Download and start TeamSpeak server
+def service_teamspeak_old():
   download_url = "https://files.teamspeak-services.com/releases/server/3.13.6/teamspeak3-server_linux_amd64-3.13.6.tar.bz2"
   download_path = "~/Téléchargements/"
 
@@ -241,6 +256,7 @@ elif role in ["re", "RE", "routeur-ent"]:
 
 # Configure SE (Serveur Entreprise)
 elif role in ["se", "SE", "serveur-ent"]:
+  download_teamspeak()
   config_interfaces([
     {"name": "eth2", "ip": "192.168.0.2/24"}
   ])
@@ -248,7 +264,7 @@ elif role in ["se", "SE", "serveur-ent"]:
     {"dest": "default", "via": "192.168.0.1", "interface": "eth2"}
   ])
   service_ricard()
-  service_teamspeak()
+  start_teamspeak()
   sys.exit(0)
 
 # Configure CL (Client)
