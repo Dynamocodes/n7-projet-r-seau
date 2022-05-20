@@ -61,7 +61,8 @@ def config_dhcp_server(interface_name):
       "subnet 120.0.7.0 netmask 255.255.255.0 {\n",
       "\trange 120.0.7.2 120.0.7.254;\n",
       "\toption domain-name-servers 120.0.5.2;\n",
-      "\toption routers 120.0.7.1;\n", 
+      "\toption routers 120.0.7.1;\n",
+      "\toption domain-name \"flamin.go\";\n",
       "}\n"
     ])
   print("[*] Configured DHCP daemon")
@@ -114,26 +115,7 @@ def config_dhcp_client(interface_name):
 
 # Config VPN
 def config_vpn():
-  print("[*] Installing Wireguard")
-  subprocess.run("apt-get -y update", stdout=subprocess.DEVNULL, shell=True)
-  subprocess.run("apt-get -y install wireguard", stdout=subprocess.DEVNULL, shell=True)
-  
-  with open("/etc/wireguard/private.key", "w+") as private_key:
-    subprocess.run("wg genkey", stdout=private_key, shell=True)
-    subprocess.run("chmod go= /etc/wireguard/private.key", stdout=subprocess.DEVNULL, shell=True)
-  
-  private = subprocess.Popen("cat /etc/wireguard/private.key", stdout=subprocess.PIPE, shell=True)
-  with open("/etc/wireguard/public.key", "w+") as public_key:
-    subprocess.run("wg pubkey", stdin=private.stdout, stdout=public_key, shell=True)
-
-  with open("/etc/wireguard/wg0.conf") as wg0:
-    wg0.writelines([
-      "[Interface]\n",
-      "PrivateKey = {}\n".format(open("/etc/wireguard/private.key").read()),
-      "Address = 10.8.0.1/24\n",
-      "ListenPort = 51820\n",
-      "SaveConfig = true\n"
-    ])
+  print("[*] Configuring VPN")
 
 def download_teamspeak():
   download_url = "https://files.teamspeak-services.com/releases/server/3.13.6/teamspeak3-server_linux_amd64-3.13.6.tar.bz2"
@@ -320,7 +302,11 @@ elif sys.argv[1] in ["dns", "DNS"]:
     sys.exit(1)
   if sys.argv[2] in ["on", "ON", "1"]:
     with open("/etc/resolv.conf", "w+") as resolv:
-      resolv.write("nameserver 120.0.5.1\n")
+      resolv.writelines([
+        "domain flamin.go\n",
+        "search flamin.go\n",
+        "nameserver 120.0.5.1\n"
+      ])
   elif sys.argv[2] in ["off", "OFF", "0"]:
     with open("/etc/resolv.conf", "w+") as resolv:
       resolv.writelines([
