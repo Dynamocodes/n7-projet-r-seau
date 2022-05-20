@@ -146,7 +146,7 @@ def service_teamspeak():
   os.system("tar -xf {} -C {}".format(download_path + "teamspeak3-server_linux_amd64-3.13.6.tar.bz2", download_path))
   print("[*] Starting TeamSpeak server")
   os.system(
-    "{} {}/teamspeak3-server_linux_amd64/ts3server_startscript.sh start serveradmin_password=password virtualserver_codec_encryption_mode=1"
+    "{} {}teamspeak3-server_linux_amd64/ts3server_startscript.sh start serveradmin_password=password virtualserver_codec_encryption_mode=1"
     .format("TS3SERVER_LICENSE=accept", download_path)
   )
 
