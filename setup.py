@@ -239,6 +239,9 @@ elif role in ["se", "SE", "serveur-ent"]:
   config_interfaces([
     {"name": "eth2", "ip": "192.168.0.2/24"}
   ])
+  config_routes([
+    {"dest": "default", "via": "192.168.0.1", "interface": "eth2"}
+  ])
   service_teamspeak()
   sys.exit(0)
 
