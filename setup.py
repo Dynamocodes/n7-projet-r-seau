@@ -150,6 +150,10 @@ def service_teamspeak():
     .format("TS3SERVER_LICENSE=accept", download_path)
   )
 
+def service_ricard():
+  print("[*] Setting up Ricard website")
+  os.system("cp index.html /var/www/html/")
+
 def bold(text):
   return "\033[1m" + text + "\033[0m"
 
@@ -243,6 +247,7 @@ elif role in ["se", "SE", "serveur-ent"]:
   config_routes([
     {"dest": "default", "via": "192.168.0.1", "interface": "eth2"}
   ])
+  service_ricard()
   service_teamspeak()
   sys.exit(0)
 
