@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
 # ATTENTION!
-# Pas de VPN
 # Pas la config OSPF Zebra
 
 import os
 import sys
-import subprocess
 
 # -------------------------------------------------------------
 
@@ -113,9 +111,27 @@ def config_dhcp_client(interface_name):
   print("[*] Restarting networking")
   os.system("systemctl restart networking")
 
-# Config VPN
-def config_vpn():
+def config_vpn_re():
+  print("[*] Installing Wireguard")
+  os.system("apt-get -y update && apt-get -y install wireguard")
   print("[*] Configuring VPN")
+  os.system("ip link add wg0 type wireguard")
+  os.system("ip addr add 10.20.0.1/24 dev wg0")
+  os.system("wg set wg0 private-key keys/re.priv")
+  os.system("ip link set wg0 up")
+  os.system("wg set wg0 keys/vmre.pub allowed-ips 10.20.0.1/32 192.168.1.0/24 192.168.0.0/24 endpoint 120.0.24.18:$(wg | awk 'FNR == 4 { print $3 }')")
+  os.system("ip route add 192.168.1.0/24 via 10.20.0.2 dev wg0")
+
+# Config VPN
+def config_vpn_vmre():
+  print("[*] Installing Wireguard")
+  os.system("apt-get -y update && apt-get -y install wireguard")
+  print("[*] Configuring VPN")
+  os.system("ip link add wg0 type wireguard")
+  os.system("ip addr add 10.20.0.2/24 dev wg0")
+  os.system("wg set wg0 private-key keys/vmre.priv")
+  os.system("ip link set wg0 up")
+  os.system("wg set wg0 keys/re.pub allowed-ips 10.20.0.1/32 192.168.1.0/24 192.168.0.0/24 endpoint 120.0.5.2:$(wg | awk 'FNR == 4 { print $3 }')")
 
 def download_teamspeak():
   download_url = "https://files.teamspeak-services.com/releases/server/3.13.6/teamspeak3-server_linux_amd64-3.13.6.tar.bz2"
@@ -223,13 +239,14 @@ elif role in ["ri", "RI", "routeur-interco"]:
 # Configure RE (Routeur Entreprise)
 elif role in ["re", "RE", "routeur-ent"]:
   enable_ipforward()
+  config_vpn_re()
   config_interfaces([
     {"name": "eth1", "ip": "120.0.5.2/24"},
     {"name": "eth2", "ip": "192.168.0.1/24"}
   ])
   config_routes([
     {"dest": "0.0.0.0/0", "via": "120.0.5.2", "interface": "eth1"},
-    {"dest": "192.168.0.0/24", "via": "192.168.0.1", "interface": "eth2"}
+    {"dest": "192.168.0.0/24", "via": "192.168.0.1", "interface": "eth2"},
   ])
   print("[*] Configuring NAT (POSTROUTING)")
   os.system("iptables -t nat -A POSTROUTING -o eth1 -j SNAT --to 120.0.5.2")
@@ -281,18 +298,26 @@ elif role in ["cl", "CL", "client"]:
   ])
   sys.exit(0)
 
-# Configure REX (Routeur d'Entreprise Extérieur)
-elif role in ["rex", "REX", "routeur-ext"]:
+# Configure VMRE (Routeur d'Entreprise Extérieur)
+elif role in ["vmre", "VMRE", "routeur-ext"]:
+  enable_ipforward()
+  config_vpn_vmre()
   config_interfaces([
     {"name": "eth0", "ip": "120.0.24.18/30"},
-    {"name": "eth1", "ip": "120.0.8.1/24"}
+    {"name": "eth1", "ip": "192.168.1.1/24"}
+  ])
+  config_routes([
+    {"dest": "192.168.0.0/24", "via": "10.20.0.1", "interface": "wg0"}
   ])
   sys.exit(0)
 
-# Configure CEX (Client d'Entreprise Extérieur)
-elif role in ["cex", "CEX", "client-ext"]:
+# Configure VMSE (Client d'Entreprise Extérieur)
+elif role in ["vmse", "VMSE", "client-ext"]:
   config_interfaces([
-    {"name": "eth0", "ip": "120.0.8.2/24"}
+    {"name": "eth0", "ip": "192.168.1.2/24"}
+  ])
+  config_routes([
+    {"dest": "default", "via": "192.168.1.1", "interface": "eth0"}
   ])
   sys.exit(0)
 
