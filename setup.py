@@ -98,7 +98,7 @@ def config_dns_server():
   print("[*] Applying DNS configuration")
   os.system("named-checkconf && service bind9 restart")
   print("[*] Changing DNS resolver")
-  with open("/etc/resolv.conf", "a") as resolv:
+  with open("/etc/resolv.conf", "w+") as resolv:
     resolv.write("nameserver 127.0.0.1\n")
 
 # Configure DHCP Client
