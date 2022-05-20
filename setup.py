@@ -71,7 +71,11 @@ def config_dhcp_server(interface_name):
 # Configure DNS
 def config_dns_server():
   print("[*] Configuring DNS Server")
+  with open("/etc/bind/named.conf.default-zones", "a") as dns_config:
     dns_config.writelines([
+      "zone \"flamin.go\" {\n",
+      "\ttype master;\n",
+      "\tfile \"/etc/bind/flamin.go.db\";\n",
       "};\n"
     ])
   print("[*] Configuring domains")
@@ -94,7 +98,7 @@ def config_dns_server():
   print("[*] Applying DNS configuration")
   os.system("named-checkconf && service bind9 restart")
   print("[*] Changing DNS resolver")
-  with open("/etc/resolv.conf", "w") as resolv:
+  with open("/etc/resolv.conf", "a") as resolv:
     resolv.write("nameserver 127.0.0.1\n")
 
 # Configure DHCP Client
@@ -122,7 +126,7 @@ def config_vpn():
   with open("/etc/wireguard/public.key", "w+") as public_key:
     subprocess.run("wg pubkey", stdin=private.stdout, stdout=public_key, shell=True)
 
-  with open("/etc/wireguard/wg0.conf", "w+") as wg0:
+  with open("/etc/wireguard/wg0.conf") as wg0:
     wg0.writelines([
       "[Interface]\n",
       "PrivateKey = {}\n".format(open("/etc/wireguard/private.key").read()),
@@ -192,7 +196,7 @@ elif role in ["ra", "RA", "routeur-acces"]:
   config_interfaces([
     {"name": "eth1", "ip": "120.0.1.1/24"},
     {"name": "eth2", "ip": "120.0.3.2/24"},
-    {"name": "eth3", "ip": "120.0.5.1/24"},
+    {"name": "eth3", "ip": "120.0.5.1/24"}
   ])
   config_quagga()
   config_dns_server()
