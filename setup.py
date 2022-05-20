@@ -4,6 +4,7 @@
 # Pas de VPN
 # Pas la config OSPF Zebra
 
+import os
 import sys
 import subprocess
 
@@ -13,25 +14,13 @@ import subprocess
 def config_interfaces(interface_definitions):
   for interface in interface_definitions:
     print("[*] Bringing up interface {} with address {}".format(interface['name'], interface['ip']))
-    subprocess.run(
-      ["ip", "link", "set", "dev", interface['name'], "up"],
-      stdout=subprocess.DEVNULL,
-      shell=True
-    )
-    subprocess.run(
-      ["ip", "addr", "add", interface['ip'], "dev", interface['name']],
-      stdout=subprocess.DEVNULL,
-      shell=True
-    )
+    os.system("ip link set dev {} up".format(interface['name']))
+    os.system("ip addr add {} dev {}".format(interface['ip'], interface['name']))
 
 def config_routes(route_definitions):
   for route in route_definitions:
     print("[*] Adding route to {} via {} ({})".format(route['dest'], route['via'], route['interface']))
-    subprocess.run(
-      ["ip", "route", "add", route['dest'], "via", route['via'], "dev", route['interface']],
-      stdout=subprocess.DEVNULL,
-      shell=True
-    )
+    os.system("ip route add {} via {} dev {}".format(route['dest'], route['via'], route['interface']))
 
 # Enable IP Forward
 def enable_ipforward():
@@ -54,17 +43,12 @@ def config_quagga():
       "babeld=no\n"
     ])
   print("[*] Restarting Quagga")
-  subprocess.run(
-    "systemctl restart quagga",
-    stdout=subprocess.DEVNULL,
-    shell=True
-  )
+  os.system("systemctl restart quagga")
 
 # Configure DHCP Server
 def config_dhcp_server(interface_name):
   print("[*] Installing DHCP")
-  subprocess.run("apt-get -y update", stdout=subprocess.DEVNULL, shell=True)
-  subprocess.run("apt-get -y install isc-dhcp-server", stdout=subprocess.DEVNULL, shell=True)
+  os.system("apt-get -y update && apt-get -y install isc-dhcp-server")
   with open("/etc/default/isc-dhcp-server", "w+") as isc_config:
     isc_config.writelines(["\n", "INTERFACES={}\n".format(interface_name)])
   print("[*] Configured ISC DHCP")
@@ -81,8 +65,7 @@ def config_dhcp_server(interface_name):
       "}\n"
     ])
   print("[*] Configured DHCP daemon")
-  subprocess.run("systemctl start isc-dhcp-server", stdout=subprocess.DEVNULL, shell=True)
-  subprocess.run("systemctl enable isc-dhcp-server", stdout=subprocess.DEVNULL, shell=True)
+  os.system("systemctl start isc-dhcp-server && systemctl enable isc-dhcp-server")
   print("[*] Started DHCP daemon")
 
 # Configure DNS
@@ -113,8 +96,7 @@ def config_dns_server():
       "voyd	IN	A	120.0.5.1\n",
     ])
   print("[*] Applying DNS configuration")
-  subprocess.run("named-checkconf", stdout=subprocess.DEVNULL, shell=True)
-  subprocess.run("service bind9 restart", stdout=subprocess.DEVNULL, shell=True)
+  os.system("named-checkconf && service bind9 restart")
   print("[*] Changing DNS resolver")
   with open("/etc/resolv.conf") as resolv:
     resolv.write("nameserver 127.0.0.1\n")
@@ -128,7 +110,7 @@ def config_dhcp_client(interface_name):
       "iface {} inet dhcp\n".format(interface_name),
     ])
   print("[*] Restarting networking")
-  subprocess.run("systemctl restart networking", stdout=subprocess.DEVNULL, shell=True)
+  os.system("systemctl restart networking")
 
 # Config VPN
 def config_vpn():
@@ -159,14 +141,13 @@ def service_teamspeak():
   download_path = "~/Téléchargements/"
 
   print("[*] Downloading TeamSpeak server")
-  subprocess.run(["wget", download_url, "-P", download_path], shell=True)
+  os.system("wget {} -P {}".format(download_url, download_path))
   print("[*] Extracting TeamSpeak server archive")
-  subprocess.run(["tar", "-xf", download_path + "teamspeak3-server_linux_amd64-3.13.6.tar.bz2", "-C", download_path], stdout=subprocess.DEVNULL, shell=True)
+  os.system("tar -xf {} -C {}".format(download_path + "teamspeak3-server_linux_amd64-3.13.6.tar.bz2", download_path))
   print("[*] Starting TeamSpeak server")
-  subprocess.run(
-    "./teamspeak3-server_linux_amd64/ts3server_startscript.sh start serveradmin_password=password virtualserver_codec_encryption_mode=1",
-    env={"TS3SERVER_LICENSE": "accept"},
-    shell=True
+  os.system(
+    "{} ./teamspeak3-server_linux_amd64/ts3server_startscript.sh start serveradmin_password=password virtualserver_codec_encryption_mode=1"
+    .format("TS3SERVER_LICENSE=accept")
   )
 
 def bold(text):
@@ -249,16 +230,8 @@ elif role in ["re", "RE", "routeur-ent"]:
     {"dest": "0.0.0.0/0", "via": "120.0.5.2", "interface": "eth1"},
     {"dest": "192.168.0.0/24", "via": "192.168.0.1", "interface": "eth2"}
   ])
-  subprocess.run(
-    "iptables -t nat -A POSTROUTING -o eth1 -j SNAT --to 120.0.5.2",
-    stdout=subprocess.DEVNULL,
-    shell=True
-  )
-  subprocess.run(
-    "iptables -t nat -A PREROUTING -p tcp --dport 80 -i eth1 -j DNAT --to 192.168.0.2:80",
-    stdout=subprocess.DEVNULL,
-    shell=True
-  )
+  os.system("iptables -t nat -A POSTROUTING -o eth1 -j SNAT --to 120.0.5.2")
+  os.system("iptables -t nat -A PREROUTING -p tcp --dport 80 -i eth1 -j DNAT --to 192.168.0.2:80")
   sys.exit(0)
 
 # Configure SE (Serveur Entreprise)
