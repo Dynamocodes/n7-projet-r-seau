@@ -71,7 +71,7 @@ def config_dhcp_server(interface_name):
 # Configure DNS
 def config_dns_server():
   print("[*] Configuring DNS Server")
-  with open("/etc/bind/named.conf.default-zones", "w+") as dns_config:
+  with open("/etc/bind/named.conf.default-zones", "a+") as dns_config:
     dns_config.writelines([
       "zone \"flamin.go\" {\n",
       "\ttype master;\n",
@@ -98,7 +98,7 @@ def config_dns_server():
   print("[*] Applying DNS configuration")
   os.system("named-checkconf && service bind9 restart")
   print("[*] Changing DNS resolver")
-  with open("/etc/resolv.conf", "w+") as resolv:
+  with open("/etc/resolv.conf", "a") as resolv:
     resolv.write("nameserver 127.0.0.1\n")
 
 # Configure DHCP Client
@@ -196,8 +196,7 @@ elif role in ["ra", "RA", "routeur-acces"]:
   config_interfaces([
     {"name": "eth1", "ip": "120.0.1.1/24"},
     {"name": "eth2", "ip": "120.0.3.2/24"},
-    {"name": "eth3", "ip": "120.0.5.1/24"},
-    {"name": "eth4", "ip": "120.0.4.1/24"}
+    {"name": "eth3", "ip": "120.0.5.1/24"}
   ])
   config_quagga()
   config_dns_server()
