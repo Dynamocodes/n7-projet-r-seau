@@ -79,7 +79,7 @@ def config_dns_server():
       "};\n"
     ])
   print("[*] Configuring domains")
-  with open("/etc/bind/flamin.go.db", "w+") as flamingo_config:
+  with open("/etc/bind/flamin.go.db", "w") as flamingo_config:
     flamingo_config.writelines([
       "$TTL	604800\n",
       "@	IN	SOA	flamin.go. root.flamin.go. (\n",
@@ -126,7 +126,7 @@ def config_vpn():
   with open("/etc/wireguard/public.key", "w+") as public_key:
     subprocess.run("wg pubkey", stdin=private.stdout, stdout=public_key, shell=True)
 
-  with open("/etc/wireguard/wg0.conf", "w+") as wg0:
+  with open("/etc/wireguard/wg0.conf") as wg0:
     wg0.writelines([
       "[Interface]\n",
       "PrivateKey = {}\n".format(open("/etc/wireguard/private.key").read()),
