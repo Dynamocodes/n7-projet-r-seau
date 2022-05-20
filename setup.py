@@ -184,7 +184,8 @@ def print_help():
   print("  RI (Routeur d'Interconnexion)")
   print("  RE (Routeur Interne d'Entreprise)")
   print("  SE (Serveur d'Entreprise)")
-  print("  CL (Client relié au RU)")
+  print("  RC* (Routeur Client)\t\t*Argument additionnel pour l'interface qui fait du DHCP")
+  print("  CL (Machine client reliée au RC)")
 
 # -------------------------------------------------------------
 
@@ -264,12 +265,38 @@ elif role in ["se", "SE", "serveur-ent"]:
     {"dest": "default", "via": "192.168.0.1", "interface": "eth2"}
   ])
   service_ricard()
-  start_teamspeak()
+  service_teamspeak()
+  sys.exit(0)
+
+# Configure RC (Routeur Client)
+elif role in ["rc", "RC", "routeur-client"]:
+  if len(sys.argv) < 3:
+    print("Donne une interface batard (sudo <script> RU <interface>)")
+    sys.exit(1)
+  enable_ipforward()
+  config_interfaces([
+    {"name": "eth2", "ip": "192.168.0.1/24"}
+  ])
+  print("[*] Configuring DHCP")
+  with open("/etc/network/interfaces", "w+") as dhcp_config:
+    dhcp_config.writelines([
+      "auto {}\n".format(sys.argv[2]),
+      "iface {} inet dhcp\n".format(sys.argv[2])
+    ])
+  print("[*] Configuring NAT")
+  os.system("iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE")
+  print("[*] Obtaining IP through DHCP")
+  os.system("dhclient {}".format(sys.argv[2]))
   sys.exit(0)
 
 # Configure CL (Client)
 elif role in ["cl", "CL", "client"]:
-  print("RAF")
+  config_interfaces([
+    {"name": "eth1", "ip": "192.168.0.2/24"}
+  ])
+  config_routes([
+    {"dest": "default", "via": "192.168.0.1", "interface": "eth1"}
+  ])
   sys.exit(0)
 
 # Configure REX (Routeur d'Entreprise Extérieur)
