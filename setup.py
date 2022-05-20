@@ -343,3 +343,4 @@ elif sys.argv[1] in ["dns", "DNS"]:
   else:
     print("Usage: sudo {} dns <on|off>".format(sys.argv[0]))
     sys.exit(1)
+  os.system("systemctl restart networking")
