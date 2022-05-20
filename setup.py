@@ -308,8 +308,27 @@ elif role in ["rex", "REX", "routeur-ext"]:
   sys.exit(0)
 
 # Configure CEX (Client d'Entreprise Extérieur)
-elif role ["cex", "CEX", "client-ext"]:
+elif role in ["cex", "CEX", "client-ext"]:
   config_interfaces([
     {"name": "eth0", "ip": "120.0.8.2/24"}
   ])
   sys.exit(0)
+
+elif sys.argv[1] in ["dns", "DNS"]:
+  if len(sys.argv) < 3:
+    print("Usage: sudo {} dns <on|off>".format(sys.argv[0]))
+    sys.exit(1)
+  if sys.argv[2] in ["on", "ON", "1"]:
+    with open("/etc/resolv.conf", "w+") as resolv:
+      resolv.write("nameserver 120.0.5.1\n")
+  elif sys.argv[2] in ["off", "OFF", "0"]:
+    with open("/etc/resolv.conf", "w+") as resolv:
+      resolv.writelines([
+        "domain enseeiht.fr\n",
+        "search enseeiht.fr\n",
+        "nameserver 147.127.245.3\n",
+        "#nameserver 8.8.4.4\n"
+      ])
+  else:
+    print("Usage: sudo {} dns <on|off>".format(sys.argv[0]))
+    sys.exit(1)
