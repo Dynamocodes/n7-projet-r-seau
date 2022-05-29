@@ -1,8 +1,5 @@
 # n7-projet-reseau
 
-![diego le gitan](./IMG_2357.jpg)
-> Attention a toi je suis diego le gitan je veux une bonne note
-
 N° du groupe : 0
 
 ## TLDR:
